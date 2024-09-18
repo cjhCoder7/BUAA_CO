@@ -1,7 +1,7 @@
 .data
 	matrix: .space  256         # G[8][8]
 	book: .space 32             # book[8]
-	str_enter:  .asciiz "\n"
+	str_enter: .asciiz "\n"
 
 .macro getMatrixIndex(%ans, %i, %j)
     sll %ans, %i, 3             # %ans = %i * 8
@@ -53,15 +53,15 @@ printInt($t1)
 end
 
 Initial:
-	li $s0, 0            # s0 = n
-	li $s1, 0            # s1 = m
-	li $t0, 0            # t0 = i
-	li $t1, 0            # t1 = ans
-	li $t2, 0            # t2 = flag
-	li $t3, 0            # t3 = x
-	li $t4, 0            # t4 = y
-	li $t5, 0            # formal parameter
-	li $t7, 1            # consistant value 1
+	li $s0, 0                        # s0 = n
+	li $s1, 0                        # s1 = m
+	li $t0, 0                        # t0 = i
+	li $t1, 0                        # t1 = ans
+	li $t2, 0                        # t2 = flag
+	li $t3, 0                        # t3 = x
+	li $t4, 0                        # t4 = y
+	li $t5, 0                        # formal parameter
+	li $t7, 1                        # consistant value 1
 	jr $ra
 	
 PutValue:
@@ -70,20 +70,20 @@ PutValue:
 	jr $ra
 	
 InputMatrix:
-	li $t0, 0                    # int i = 0
-	li $t6, 1                    # 1
+	li $t0, 0                        # int i = 0
+	li $t6, 1                        # 1
 	Begin:
 		slt $t5, $t0, $s1
 		beq $t5, $0, End
 		getInt($t3)
 		getInt($t4)
-		addi $t3, $t3, -1        # x - 1
-		addi $t4, $t4, -1        # y - 1
+		addi $t3, $t3, -1            # x - 1
+		addi $t4, $t4, -1            # y - 1
 		getMatrixIndex($t5,$t3,$t4)
 		sw $t6, matrix($t5)
 		getMatrixIndex($t5,$t4,$t3)
 		sw $t6, matrix($t5)
-		addi $t0, $t0, 1         # i++
+		addi $t0, $t0, 1             # i++
 		j Begin		
 	End:
 		li $t6, 0
@@ -94,12 +94,12 @@ InputMatrix:
 DFS:
 	push($ra)
 	push($t5)
-	move $t5, $a0                # t5 formal parameter a0 actual parameter
-	getBookIndex($t6, $t5)       # t6 temp index
-	sw $t7, book($t6)            # book[x] = 1
+	move $t5, $a0                    # t5 formal parameter a0 actual parameter
+	getBookIndex($t6, $t5)           # t6 temp index
+	sw $t7, book($t6)                # book[x] = 1
 	
-	li $t2, 1                    # flag = 1
-	li $t0, 0                    # i = 0
+	li $t2, 1                        # flag = 1
+	li $t0, 0                        # i = 0
 	
 	for_1_begin:
 		slt $s7, $t0, $s0
