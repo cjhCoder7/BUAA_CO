@@ -118,12 +118,12 @@ OutputValue:
                 printInt($t2)
                 printEnter
 
-                addi $s3, $s3, -1        # j--
+                addi $s3, $s3, -1    # j--
                 j for_4_begin
 
         for_4_end:
             addi $s2, $s2, -1
-            addi $s3, $s1, -1            # j = m - 1  重要：重置第二层循环的循环变量
+            addi $s3, $s1, -1        # j = m - 1  重要：重置第二层循环的循环变量
             j for_3_begin
     for_3_end:
         li $s2, 0
