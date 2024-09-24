@@ -33,7 +33,7 @@ module cpu_checker(
 
     // State transition logic
     always @(posedge clk) begin
-		  if (reset) begin
+		if (reset) begin
             stateNext <= init;
             typeState <= 0;
             decCount <= 0;
