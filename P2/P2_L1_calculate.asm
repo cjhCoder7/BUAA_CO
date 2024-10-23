@@ -31,13 +31,13 @@
 .macro printSpace
     la  $a0, str_space
     li  $v0, 4
-    syscall                     # Êä³öÒ»¸ö¿Õ¸ñ
+    syscall                     # ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Õ¸ï¿½
 .end_macro
 
 .macro printEnter
     la $a0, str_enter
     li $v0, 4
-    syscall                     # Êä³öÒ»¸ö»Ø³µ
+    syscall                     # ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ø³ï¿½
 .end_macro
 
 .macro addr(%dst, %src)
@@ -70,7 +70,6 @@ Process:
 		beqz $t0, End1
 		
 		get_char($t1)
-		get_char($t2)
 		Begin2:
 			slt $t3, $s3, $s2
 			beqz $t3, End2
