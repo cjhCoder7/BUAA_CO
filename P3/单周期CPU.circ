@@ -9,7 +9,7 @@
   <lib desc="#Memory" name="4">
     <tool name="ROM">
       <a name="contents">addr/data: 8 8
-0
+0 
 </a>
     </tool>
   </lib>
