@@ -34,31 +34,46 @@ module ALU(
     output reg Ov     // 判断是否算数溢出 
     );
 
+    reg [32:0] temp; // 33位扩展寄存器，用于溢出检测
+
     always @(*) begin
-        Ov = 1'b0;
+        Ov = 1'b0; // 默认没有溢出
+        temp = 33'b0; // 初始化temp
+
         case (ALUop)
             `ADD: begin
-                C = A + B;
-                if ((A[31] == B[31]) && (C[31] != A[31])) begin     // 符号位相同，结果符号位不同即溢出 
+                temp = {A[31], A} + {B[31], B}; // 符号扩展到33位进行加法
+                if (temp[32] != temp[31]) begin // 溢出条件：最高位和第31位不同
                     Ov = 1'b1;
+                    C = 32'h0; // 输出全0
+                end else begin
+                    C = temp[31:0]; // 取低32位作为结果
                 end
             end
             `SUB: begin
-                C = A - B;
-                if ((A[31] != B[31]) && (C[31] != A[31])) begin     // 符号位不同，结果符号位不同即溢出
+                temp = {A[31], A} - {B[31], B}; // 符号扩展到33位进行减法
+                if (temp[32] != temp[31]) begin // 溢出条件：最高位和第31位不同
                     Ov = 1'b1;
+                    C = 32'h0; // 输出全0
+                end else begin
+                    C = temp[31:0]; // 取低32位作为结果                    
                 end
             end
-            `AND:
+            `AND: begin
                 C = A & B;
-            `OR:
-                C = A | B;
-            `LUI:
-                C = {B[15:0], 16'h0};
-            `Other: begin
-                // 扩展的 ALU 指令
             end
-            default : C = 0;
+            `OR: begin
+                C = A | B;
+            end
+            `LUI: begin
+                C = {B[15:0], 16'h0}; // 将 B 的低 16 位移动到高位
+            end
+            `Other: begin
+                //根据需求扩展
+            end
+            default: begin
+                C = 32'b0; // 默认输出为0
+            end
         endcase
     end
 
