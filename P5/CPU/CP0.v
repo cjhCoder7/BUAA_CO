@@ -29,7 +29,7 @@ module CP0(
     input [4:0] ExcCodeIn,  // 记录异常类型
     input EXLClr,           // 用来复位EXL
     output [31:0] EPCOut,   // EPC的值
-    output reg Req              // 进入处理程序的请求
+    output Req              // 进入处理程序的请求
     );
 
     reg [31:0] SR;          // 编号12,状态寄存器 R/W, 配置异常的功能。
@@ -41,7 +41,6 @@ module CP0(
         Cause = 32'h0;
         EPC = 32'h0;
         CP0Out = 32'h0;
-        Req = 1'b0;
     end
 
     always @(posedge Clk) begin
@@ -49,7 +48,6 @@ module CP0(
             SR <= 32'h0;
             Cause <= 32'h0;
             EPC <= 32'h0;
-            Req <= 1'b0;
         end else begin
             // 写入操作
             if (En) begin
@@ -60,23 +58,18 @@ module CP0(
                     default: ;
                 endcase
             end
-
+            
             // EXLClr 信号清除 SR[1] 位
             if (EXLClr) begin
-                SR[1] = 1'b0;
-                Cause[6:2] = 5'b00000;
+                SR[1] <= 1'b0;
             end
 
-            if (Req) begin
-                Cause[6:2] = ExcCodeIn;      // 记录异常类型
-                EPC = VPC;                   // 若 EXL 位为 0，保存受害 PC
-                SR[1] = 1'b1;                // 设置 EXL 位
+            if ((ExcCodeIn != 5'b00000) && (SR[1] == 0)) begin
+                Cause[6:2] <= ExcCodeIn;      // 记录异常类型
+                EPC <= VPC;                   // 若 EXL 位为 0，保存受害 PC
+                SR[1] <= 1'b1;                // 设置 EXL 位          
             end
         end
-    end
-
-    always @(*) begin
-        Req = !SR[1] && (ExcCodeIn != 5'b00000);
     end
 
     // 读操作
@@ -91,5 +84,7 @@ module CP0(
 
     // EPC 输出
     assign EPCOut = EPC;
+
+    assign Req = (ExcCodeIn != 5'b00000) && (SR[1] == 0);
 
 endmodule

@@ -23,7 +23,8 @@ module DM(
     input [31:0] WD,    // 要写入内存的数据
     input [31:0] PC,    // 对应指令的地址
     input DMWr,         // 写使能端口
-    input [2:0] WDsel,  // 写使能端口
+    input DMJudge,      // 旧的写使能端口，不受Req影响
+    input [2:0] WDsel,  // 写数据选择端口
     input Clk,
     input Reset,
     output reg [31:0] RD,   // 内存中对应地址所有的数据
@@ -52,14 +53,9 @@ module DM(
             end
         end
         else begin
-            AdEs <= 1'b0;
             if (DMWr) begin
-                if (A[1:0] != 2'b00 || A > 32'h0000_2fff || A < 32'h0000_0000) begin
-                    AdEs <= 1'b1;
-                end else begin
-                    Datas[A[11:2]] = WD;
-                    $display("@%h: *%h <= %h", PC, A, WD);
-                end  
+                Datas[A[13:2]] = WD;
+                $display("@%h: *%h <= %h", PC, A, WD);
             end
         end
     end
@@ -67,11 +63,17 @@ module DM(
     // 读出操作：组合逻辑
     always @(*) begin
         AdEl = 1'b0;
-        if (!DMWr && WDsel == 3'b001) begin
+        AdEs = 1'b0;
+        if (DMJudge) begin
+            if (A[1:0] != 2'b00 || A > 32'h0000_2fff || A < 32'h0000_0000) begin
+                AdEs = 1'b1;
+            end
+        end
+        if (!DMJudge && WDsel == 3'b001) begin
             if (A[1:0] != 2'b00 || A > 32'h0000_2fff || A < 32'h0000_0000) begin
                 AdEl = 1'b1;
             end else begin
-                RD = Datas[A[11:2]];
+                RD = Datas[A[13:2]];
             end
         end
     end

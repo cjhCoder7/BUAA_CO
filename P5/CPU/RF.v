@@ -27,8 +27,8 @@ module RF(
     input RFWr,
     input Clk,
     input Reset,
-    output [31:0] RD1,  // rs 寄存器的值
-    output [31:0] RD2   // rt 寄存器的值
+    output reg [31:0] RD1,  // rs 寄存器的值
+    output reg [31:0] RD2   // rt 寄存器的值
     );
 
     reg [31:0] Registers[0:31];
@@ -59,8 +59,10 @@ module RF(
     end
 
     // 读出操作：组合逻辑
-    assign RD1 = Registers[A1];
-    assign RD2 = Registers[A2];
+    always @(*) begin
+        RD1 = Registers[A1];
+        RD2 = Registers[A2];
+    end
 
 
 endmodule

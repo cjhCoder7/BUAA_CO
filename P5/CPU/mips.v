@@ -33,7 +33,7 @@ module mips(
 
     wire [1:0] wrSel, bSel;
     wire [2:0] npcOp, wdSel;
-    wire extOp, rfWr, dmWr;
+    wire extOp, rfWr, dmWr, dmJudge;
     wire [2:0] aluOp; 
 
     wire zero;
@@ -47,7 +47,8 @@ module mips(
     wire [4:0] excCodeIn;
 
     CP0 cp0 (.Clk(clk), .Reset(reset), .En(en), .CP0Add(instruction[15:11]), .CP0In(rd2),
-             .CP0Out(cp0out), .VPC(pc), .ExcCodeIn(excCodeIn), .EXLClr(exlclr), .EPCOut(epcout), .Req(req));
+             .CP0Out(cp0out), .VPC(pc), .ExcCodeIn(excCodeIn), .EXLClr(exlclr), .EPCOut(epcout), 
+             .Req(req));
 
     PC Pc (.Clk(clk), .Reset(reset), .NPC(npc), .NowPC(pc));
 
@@ -60,7 +61,7 @@ module mips(
                     .NPCop(npcOp), .WRsel(wrSel), .EXTop(extOp), .WDsel(wdSel), 
                     .RFWr(rfWr), .Bsel(bSel), .ALUop(aluOp), .DMWr(dmWr), .Zero(zero),
                     .EXLClr(exlclr), .Mco(instruction[25:21]), .En(en), .Req(req),
-                    .ExcCodeIn(excCodeIn), .Adel_IM(adel1), .Adel_DM(adel2), .Ades(ades), .Ov(ov));
+                    .ExcCodeIn(excCodeIn), .Adel_IM(adel1), .Adel_DM(adel2), .Ades(ades), .Ov(ov), .DMJudge(dmJudge));
 
     MUX4_5 RegAddr(.input0(instruction[20:16]), .input1(instruction[15:11]),
                    .input2(5'd31), .input3(5'b00000), .select(wrSel), .out(regAddr));
@@ -68,7 +69,8 @@ module mips(
     EXT ext(.Imm16(instruction[15:0]), .EXTop(extOp), .Bit32(extNum));
 
     MUX8_32 RegData(.input0(aluNum), .input1(dmNum), .input2(pc4), 
-                    .input3(cp0out), .select(wdSel), .out(regData));
+                    .input3(cp0out), .input4(0), .input5(0), .input6(0), .input7(0),
+                    .select(wdSel), .out(regData));
 
     RF rf(.PC(pc), .Reset(reset), .Clk(clk), .RFWr(rfWr),
           .A1(instruction[25:21]), .A2(instruction[20:16]), .A3(regAddr), .WD(regData),
@@ -79,6 +81,8 @@ module mips(
 
     ALU alu(.A(rd1), .B(bData), .ALUop(aluOp), .Zero(zero), .C(aluNum), .Ov(ov));
 
-    DM dm(.PC(pc), .Reset(reset), .Clk(clk), .WD(rd2), .DMWr(dmWr), .A(aluNum), .RD(dmNum), .AdEl(adel2), .AdEs(ades), .WDsel(wdSel));
+    DM dm(.PC(pc), .Reset(reset), .Clk(clk), .WD(rd2), .DMWr(dmWr), .DMJudge(dmJudge), .A(aluNum),
+          .RD(dmNum),
+          .AdEl(adel2), .AdEs(ades), .WDsel(wdSel));
 
 endmodule

@@ -46,13 +46,13 @@ module DM(
         end
         else begin
             if (DMWr) begin
-                Datas[A[11:2]] = WD;
+                Datas[A[13:2]] = WD;
                 $display("@%h: *%h <= %h", PC, A, WD);
             end
         end
     end
 
     // 读出操作：组合逻辑
-    assign RD = Datas[A[11:2]];
+    assign RD = Datas[A[13:2]];
 
 endmodule

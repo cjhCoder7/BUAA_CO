@@ -44,7 +44,7 @@ module ALU(
             `OR:
                 C = A | B;
             `LUI:
-                C = {B[15:0], 16'h0};
+                C = B << 16;
             `Other: begin
                 // 扩展的 ALU 指令
             end

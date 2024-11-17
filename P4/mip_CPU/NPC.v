@@ -47,7 +47,7 @@ module NPC(
             NPC = RA32;
         end
         else begin
-            NPC = 32'h0000_3000;
+            NPC = PC;
         end
     end
 

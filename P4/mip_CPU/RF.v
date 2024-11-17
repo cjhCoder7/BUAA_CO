@@ -24,6 +24,7 @@ module RF(
     input [4:0] A3, // rd 寄存器地址
     input [31:0] WD,    // 要写入的数据
     input [31:0] PC,    // 当前指令的地址
+    input [31:0] Instruction,
     input RFWr,
     input Clk,
     input Reset,
@@ -36,7 +37,7 @@ module RF(
 
     initial begin
         for (i = 0; i < 32; i = i + 1) begin
-            Registers[i] <= 0;
+            Registers[i] = 0;
         end
     end
 
@@ -48,10 +49,13 @@ module RF(
             end
         end
         else begin
-            if (A3 == 5'b00000) begin
+            if (A3 == 0) begin
                 // 不更改 0 号寄存器
             end
             else if (RFWr) begin
+                if (PC == 32'h00003024) begin
+                    $display("@%h: $%d <= %h", PC, A3, Instruction);
+                end
                 Registers[A3] <= WD;
                 $display("@%h: $%d <= %h", PC, A3, WD);
             end

@@ -29,6 +29,7 @@ module Control(
     output [1:0] Bsel,
     output [2:0] ALUop,
     output DMWr,
+    output DMJudge,
     input Zero,
     input [4:0] Mco,
     input Req,
@@ -70,6 +71,8 @@ module Control(
     assign EXTop = LW | SW;                       // 需要有符号扩展的指令
     assign RFWr  = (LW | LUI | ADD | SUB | ORI | JAL | MFC0) && (Req == 0);    // 需要向寄存器写入值的有这些指令, 确保异常时不会发生写入
     assign DMWr  = SW && (Req == 0); 
+    assign DMJudge = SW;
+
     // 选择哪个寄存器应该被写入，默认是rt；sub和add需要rd；jal需要31号寄存器
     assign WRsel = (SUB | ADD) ? 2'b01 :
                    (JAL) ? 2'b10 : 2'b00;
