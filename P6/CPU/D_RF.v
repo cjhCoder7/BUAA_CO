@@ -1,27 +1,9 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date:    11:51:58 10/29/2024 
-// Design Name: 
-// Module Name:    RF 
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
-// Description: 
-//
-// Dependencies: 
-//
-// Revision: 
-// Revision 0.01 - File Created
-// Additional Comments: 
-//
-//////////////////////////////////////////////////////////////////////////////////
-module RF(
-    input [4:0] A1, // rs 寄存器地址
-    input [4:0] A2, // rt 寄存器地址
-    input [4:0] A3, // rd 寄存器地址
+
+module D_RF (
+	input [4:0] A1,     // rs 寄存器地址
+    input [4:0] A2,     // rt 寄存器地址
+    input [4:0] A3,     // rd 寄存器地址
     input [31:0] WD,    // 要写入的数据
     input [31:0] PC,    // 当前指令的地址
     input RFWr,
@@ -53,14 +35,14 @@ module RF(
             end
             else if (RFWr) begin
                 Registers[A3] <= WD;
-                $display("@%h: $%d <= %h", PC, A3, WD);
+                $display("%d@%h: $%d <= %h", $time, PC, A3, WD);
             end
         end
     end
 
     // 读出操作：组合逻辑
-    assign RD1 = Registers[A1];
-    assign RD2 = Registers[A2];
+    assign RD1 = (A1 == A3 && RFWr == 1 && A1 != 0) ? WD : Registers[A1];
+    assign RD2 = (A2 == A3 && RFWr == 1 && A2 != 0) ? WD : Registers[A2];
 
 
 endmodule
