@@ -30,7 +30,7 @@ module D_NPC(
         end
         else if(NPCop == 2'b10) begin
             // J 型指令跳转（j/jal）
-            NPC = {F_PC[31:28], Imm26, 2'b00};
+            NPC = {D_PC[31:28], Imm26, 2'b00};
         end
         else if(NPCop == 2'b11) begin
             // jr 指令读取 $ra 寄存器，成功跳转

@@ -3,6 +3,9 @@
 module Control(
     input [5:0] Opcode,
     input [5:0] Funct,
+
+    input cmpSuc,    // 用来判断是否需要更改写入的寄存器，也就是WRsel，一般用于链接
+
     output [2:0] NPCop,
     output [2:0] WRsel,
     output EXTop,
@@ -12,7 +15,8 @@ module Control(
     output [2:0] ALUop,
     output DMWr,
     output [2:0] D_Tuse_rs,
-    output [2:0] D_Tuse_rt
+    output [2:0] D_Tuse_rt,
+    output [1:0] CMPop
     );
 
     wire ADD, SUB, ORI, BEQ, LW, SW, NOP, LUI, J, JAL, JR;
@@ -50,6 +54,8 @@ module Control(
                    (SUB) ? 3'b001 :
                    (ORI) ? 3'b011 : 
                    (LUI) ? 3'b100 : 3'b101;
+    // 比较操作选择，00代表相等的比较，01为其他的比较方式
+    assign CMPop = (BEQ) ? 2'b00 : 2'b01;
 
     assign D_Tuse_rs = (ADD | SUB | ORI | LW | SW | LUI) ? 3'b001 :
                        (BEQ | JR | JAL) ? 3'b000 : 3'b011;

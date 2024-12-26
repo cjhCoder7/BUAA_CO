@@ -56,7 +56,7 @@ module mips(
 
     RF rf(.PC(pc), .Reset(reset), .Clk(clk), .RFWr(rfWr),
           .A1(instruction[25:21]), .A2(instruction[20:16]), .A3(regAddr), .WD(regData),
-          .RD1(rd1), .RD2(rd2), .Instruction(instruction));
+          .RD1(rd1), .RD2(rd2));
 
     MUX4_32 BData(.input0(rd2), .input1(extNum),
                   .input2(0), .input3(0), .select(bSel), .out(bData));

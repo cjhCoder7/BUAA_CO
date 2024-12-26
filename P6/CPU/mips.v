@@ -11,17 +11,19 @@ module mips (
 	wire f_pc_en;
 	/*************************/
 	/**********  FD  **********/
+	wire NOP_insert;
 	wire [31:0] d_pc, d_instruction;
 	/*************************/
 	/**********  D  **********/
 	wire [31:0] d_rs, d_rt;
 	wire [31:0] fwd_d_rs, fwd_d_rt;
+
 	wire [4:0] d_regAddr;
 	wire [31:0] d_npc;
 	wire [31:0] d_imm32;
 
 	wire d_cmpSuc;
-
+	wire [1:0] d_CMPop;
 	wire d_extOp;
 	wire [2:0] d_regAddrSel;
 	wire [2:0] d_npcOp;
@@ -34,9 +36,9 @@ module mips (
 	/*************************/
 	/**********  E  **********/
 	wire [31:0] e_aluB, e_aluC;
+	wire [31:0] fwd_e_rs, fwd_e_rt;
 
 	wire e_regWr;
-	wire [31:0] fwd_e_rs, fwd_e_rt;
 	wire [31:0] e_regData;
 	wire [2:0] e_regDataSel;
 
@@ -107,12 +109,18 @@ module mips (
 		);
 	/*******************************/
 	/**********  F_D  **********/
-	FD_Reg FD_Reg(
+	assign NOP_insert = 1'b0;
+
+	FD FD_Reg(
 		.Clk          (clk),
 		.Reset        (reset),
+
 		.F_PC         (f_pc),
 		.F_Instruction(f_instruction),
 		.Flush        (flush),			// 用于阻塞
+
+		.NOP_Insert   (NOP_insert),
+
 		.D_Instruction(d_instruction),
 		.D_PC         (d_pc)
 		);
@@ -126,7 +134,8 @@ module mips (
 		.NPCop (d_npcOp),
 		.WRsel (d_regAddrSel),
 		.D_Tuse_rs(d_tuse_rs),
-		.D_Tuse_rt(d_tuse_rt)
+		.D_Tuse_rt(d_tuse_rt),
+		.CMPop (d_CMPop)
 		);
 
 	D_RF D_Stage_RF(
@@ -169,7 +178,12 @@ module mips (
 					  (d_instruction[20:16] == m_regAddr && m_regWr == 1) ? m_regData : d_rt;
 
 	// CMP 比较器
-	assign d_cmpSuc = (fwd_d_rs == fwd_d_rt) ? 1 : 0;
+	D_CMP D_Stage_CMP(
+		.rt(fwd_d_rt),
+		.rs(fwd_d_rs),
+		.CMPop(d_CMPop),
+		.cmpSuc(d_cmpSuc)
+		);
 
 	// 选择d_regAddr
 	assign d_regAddr = (d_regAddrSel == 0) ? d_instruction[20:16] : 
@@ -180,6 +194,7 @@ module mips (
 	DE DE_Reg(
 		.Clk          (clk),
 		.Reset        (reset),
+
 		.D_PC         (d_pc),
 		.D_Instruction(d_instruction),
 		.Flush        (flush),
@@ -187,6 +202,7 @@ module mips (
 		.D_RT_Data    (fwd_d_rt),
 		.D_RegAddr    (d_regAddr),
 		.D_Imm32      (d_imm32),
+
 		.E_Instruction(e_instruction),
 		.E_PC         (e_pc),
 		.E_RS_Data    (e_rs),
@@ -235,12 +251,14 @@ module mips (
 	EM EM_Reg(
 		.Clk          (clk),
 		.Reset        (reset),
+
 		.E_PC         (e_pc),
 		.E_Instruction(e_instruction),
 		.E_Imm32      (e_imm32),
 		.E_RT_Data    (fwd_e_rt),
 		.E_AluC       (e_aluC),
 		.E_RegAddr    (e_regAddr),
+		
 		.M_Instruction(m_instruction),
 		.M_PC         (m_pc),
 		.M_AluC       (m_aluC),
@@ -278,17 +296,18 @@ module mips (
 	assign m_regData = (m_regDataSel == 2) ? m_pc + 8 :
 					   (m_regDataSel == 0) ? m_aluC : 0;
 
-
 	/*******************************/
 	/**********  M_W  **********/
 	MW MW_Reg(
 		.Clk          (clk),
 		.Reset        (reset),
+
 		.M_PC         (m_pc),
 		.M_Instruction(m_instruction),
 		.M_AluC       (m_aluC),
 		.M_DMrd       (m_dmData),
 		.M_RegAddr    (m_regAddr),
+
 		.W_Instruction(w_instruction),
 		.W_PC         (w_pc),
 		.W_DMrd       (w_dmData),
@@ -308,5 +327,6 @@ module mips (
 	assign w_regData = (w_regDataSel == 0) ? w_aluC :
 					   (w_regDataSel == 1) ? w_dmData : 
 					   (w_regDataSel == 2) ? w_pc + 8 : 0;
+
 	/*******************************/
 endmodule
