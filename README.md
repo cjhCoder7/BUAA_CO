@@ -1,7 +1,7 @@
 # BUAA_CO
 My Computer Organization lab and reflection
 
-2024年BUAA北京航空航天大学秋季学期计算机组成原理个人实验仓库，主要P5之后的实验针对于计算机拔尖计划，与计算机大类有所不同。
+2024年BUAA北京航空航天大学秋季学期计算机组成原理个人实验仓库，P5之后的实验针对于计算机拔尖计划，与计算机大类有所不同。
 
 - **Pre**：`Logisim` + `verilog` + MIPS汇编，主要考察教程的预习情况
 - **P0**：课下：搭建CRC校验码计算电路， ALU, GRF，正则表达式匹配；课上：Logisim完成部件及FSM设计
